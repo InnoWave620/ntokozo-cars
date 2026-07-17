@@ -1,180 +1,226 @@
-import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
+import {
+  FlatList,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ExternalLink } from '@/components/external-link';
+import { NavigationLayout } from '@/components/navigation-layout';
+import { FilterChips } from '@/components/filter-chips';
+import { SearchBar } from '@/components/search-bar';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { VehicleCard } from '@/components/vehicle-card';
+import { Brand, MaxContentWidth, Spacing } from '@/constants/theme';
+import { BRANDS, MOCK_VEHICLES, PROVINCES } from '@/data/vehicles';
+import { useFavorites } from '@/hooks/use-favorites';
 import { useTheme } from '@/hooks/use-theme';
+import { useVehicles } from '@/hooks/use-vehicles';
+import { ListingType, SearchFilters, TransmissionType } from '@/types/vehicle';
+import { Vehicle } from '@/types/vehicle';
 
-export default function TabTwoScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
-  };
+const LISTING_TYPES = [
+  { label: 'Standard Sale', value: 'Standard Sale' },
+  { label: 'Takeover', value: 'Installment Takeover' },
+];
+
+const TRANSMISSIONS = [
+  { label: 'Automatic', value: 'Automatic' },
+  { label: 'Manual', value: 'Manual' },
+];
+
+export default function BrowseScreen() {
+  const insets = useSafeAreaInsets();
   const theme = useTheme();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const params = useLocalSearchParams<{ type?: string }>();
 
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
-    },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
-    },
-  });
+  const [query, setQuery] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedType, setSelectedType] = useState<string>(
+    params.type ?? '',
+  );
+  const [selectedTransmission, setSelectedTransmission] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const filters: SearchFilters = {
+    query: query || undefined,
+    brand: selectedBrand || undefined,
+    listingType: (selectedType as ListingType) || undefined,
+    transmission: (selectedTransmission as TransmissionType) || undefined,
+  };
+
+  const vehicles = useVehicles(filters);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 600);
+  }, []);
+
+  const paddingTop = Platform.OS === 'web' ? 72 : insets.top + Spacing.three;
+
+  const renderHeader = useCallback(
+    () => (
+      <View style={[styles.header, { paddingTop }]}>
+        {/* Title */}
+        <View style={styles.titleRow}>
+          <ThemedText style={styles.pageTitle}>Browse Vehicles</ThemedText>
+          <View style={[styles.countBadge, { backgroundColor: Brand.gold }]}>
+            <ThemedText style={styles.countText}>{vehicles.length}</ThemedText>
+          </View>
+        </View>
+
+        {/* Search */}
+        <SearchBar
+          value={query}
+          onChangeText={setQuery}
+          onClear={() => setQuery('')}
+        />
+
+        {/* Filters */}
+        <View style={styles.filters}>
+          <FilterChips
+            label="Listing Type"
+            options={LISTING_TYPES}
+            selected={selectedType}
+            onSelect={setSelectedType}
+          />
+          <FilterChips
+            label="Brand"
+            options={BRANDS.map((b) => ({ label: b, value: b }))}
+            selected={selectedBrand}
+            onSelect={setSelectedBrand}
+            allLabel="All Brands"
+          />
+          <FilterChips
+            label="Transmission"
+            options={TRANSMISSIONS}
+            selected={selectedTransmission}
+            onSelect={setSelectedTransmission}
+          />
+        </View>
+      </View>
+    ),
+    [paddingTop, query, selectedType, selectedBrand, selectedTransmission, vehicles.length],
+  );
+
+  const renderVehicle = useCallback(
+    ({ item }: { item: Vehicle }) => (
+      <View style={styles.cardWrapper}>
+        <VehicleCard
+          vehicle={item}
+          isFavorite={isFavorite(item.id)}
+          onFavoriteToggle={toggleFavorite}
+        />
+      </View>
+    ),
+    [isFavorite, toggleFavorite],
+  );
+
+  const renderEmpty = useCallback(
+    () => (
+      <View style={styles.empty}>
+        <ThemedText style={styles.emptyIcon}>🔍</ThemedText>
+        <ThemedText style={styles.emptyTitle}>No vehicles found</ThemedText>
+        <ThemedText themeColor="textSecondary" style={styles.emptyDesc}>
+          Try adjusting your search or filters
+        </ThemedText>
+      </View>
+    ),
+    [],
+  );
 
   return (
-    <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
-      contentInset={insets}
-      contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This starter app includes example{'\n'}code to help you get started.
-          </ThemedText>
-
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
-                />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
-        </ThemedView>
-
-        <ThemedView style={styles.sectionsWrapper}>
-          <Collapsible title="File-based routing">
-            <ThemedText type="small">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="small">
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
-              the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/tutorial-web.png')}
-                style={styles.imageTutorial}
-              />
-            </ThemedView>
-          </Collapsible>
-
-          <Collapsible title="Images">
-            <ThemedText type="small">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
-              screen densities.
-            </ThemedText>
-            <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Animations">
-            <ThemedText type="small">
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
-            </ThemedText>
-          </Collapsible>
-        </ThemedView>
-        {Platform.OS === 'web' && <WebBadge />}
-      </ThemedView>
-    </ScrollView>
+    <NavigationLayout>
+      <FlatList
+        style={[styles.list, { backgroundColor: theme.background }]}
+        data={vehicles}
+        keyExtractor={(v) => v.id}
+        renderItem={renderVehicle}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmpty}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: insets.bottom + 100 },
+          vehicles.length === 0 && styles.contentEmpty,
+        ]}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Brand.gold}
+            colors={[Brand.gold]}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      />
+    </NavigationLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  container: {
+  list: { flex: 1 },
+  content: {
     maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    width: '100%',
+    paddingBottom: 100,
+  },
+  contentEmpty: {
     flexGrow: 1,
   },
-  titleContainer: {
+  header: {
     gap: Spacing.three,
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
+    paddingBottom: Spacing.three,
   },
-  centerText: {
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.three,
+  },
+  pageTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: -0.8,
+  },
+  countBadge: {
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 2,
+    borderRadius: 100,
+  },
+  countText: {
+    color: '#111',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  filters: {
+    gap: Spacing.two,
+  },
+  cardWrapper: {
+    paddingHorizontal: Spacing.three,
+    marginBottom: Spacing.three,
+  },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.six,
+    gap: Spacing.two,
+  },
+  emptyIcon: {
+    fontSize: 48,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
     textAlign: 'center',
   },
-  pressed: {
-    opacity: 0.7,
-  },
-  linkButton: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
-    justifyContent: 'center',
-    gap: Spacing.one,
-    alignItems: 'center',
-  },
-  sectionsWrapper: {
-    gap: Spacing.five,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-  },
-  collapsibleContent: {
-    alignItems: 'center',
-  },
-  imageTutorial: {
-    width: '100%',
-    aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
-    marginTop: Spacing.two,
-  },
-  imageReact: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
+  emptyDesc: {
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

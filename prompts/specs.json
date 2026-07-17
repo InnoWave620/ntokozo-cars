@@ -1,0 +1,199 @@
+{
+    "project": {
+        "name": "Ntokozo Cars Platform",
+        "type": "Premium Automotive Marketplace",
+        "description": "Build a luxury automotive platform exclusively for Ntokozo Cars to showcase pre-owned vehicles and installment takeover deals."
+    },
+    "objective": {
+        "primary": "Develop a world-class luxury automotive platform.",
+        "focus": [
+            "Pre-owned vehicle inventory",
+            "Installment takeover deals",
+            "Premium user experience",
+            "Fast performance",
+            "SEO",
+            "Mobile-first design"
+        ]
+    },
+    "architecture": {
+        "monorepo": true,
+        "tool": "Turborepo",
+        "language": "TypeScript",
+        "apps": [
+            "website",
+            "mobile",
+            "admin",
+            "api"
+        ],
+        "packages": [
+            "ui",
+            "auth",
+            "database",
+            "types",
+            "hooks",
+            "services",
+            "utils",
+            "config"
+        ]
+    },
+    "techStack": {
+        "website": {
+            "framework": "Next.js",
+            "language": "TypeScript",
+            "styling": "Tailwind CSS",
+            "components": "shadcn/ui",
+            "animations": [
+                "Framer Motion",
+                "GSAP"
+            ]
+        },
+        "mobile": {
+            "framework": "React Native",
+            "runtime": "Expo"
+        },
+        "backend": {
+            "framework": "NestJS"
+        },
+        "database": {
+            "engine": "PostgreSQL",
+            "orm": "Prisma"
+        },
+        "search": "Meilisearch",
+        "cache": "Redis",
+        "storage": "Cloudflare R2",
+        "notifications": "Firebase Cloud Messaging",
+        "authentication": "JWT"
+    },
+    "branding": {
+        "style": "Luxury",
+        "theme": "Dark",
+        "colors": {
+            "primary": "#111111",
+            "secondary": "#C9A227",
+            "background": "#FFFFFF",
+            "accent": "#E63946"
+        },
+        "lookAndFeel": [
+            "Elegant",
+            "Modern",
+            "Premium",
+            "Minimal",
+            "High-end automotive"
+        ]
+    },
+    "website": {
+        "pages": [
+            "Home",
+            "Vehicle Listings",
+            "Vehicle Details",
+            "About",
+            "Contact",
+            "Login",
+            "Register",
+            "Profile",
+            "Favorites"
+        ]
+    },
+    "vehicleFeatures": {
+        "listingTypes": [
+            "Standard Sale",
+            "Installment Takeover"
+        ],
+        "fields": [
+            "Brand",
+            "Model",
+            "Year",
+            "Price",
+            "Mileage",
+            "Transmission",
+            "Fuel Type",
+            "Engine",
+            "Colour",
+            "VIN",
+            "Description",
+            "Features",
+            "Photos",
+            "Videos"
+        ]
+    },
+    "installmentTakeover": {
+        "enabled": true,
+        "fields": [
+            "Monthly Installment",
+            "Remaining Finance Term",
+            "Deposit",
+            "Finance Institution",
+            "Balloon Payment",
+            "Settlement Amount",
+            "Finance Approval Required"
+        ],
+        "application": {
+            "fields": [
+                "Full Name",
+                "Phone Number",
+                "Email Address",
+                "Monthly Income",
+                "Employment Status"
+            ]
+        }
+    },
+    "searchFilters": [
+        "Brand",
+        "Model",
+        "Year",
+        "Price",
+        "Monthly Installment",
+        "Mileage",
+        "Transmission",
+        "Fuel Type",
+        "Province",
+        "Listing Type"
+    ],
+    "adminDashboard": {
+        "features": [
+            "Dashboard",
+            "Vehicle Management",
+            "Image Upload",
+            "Video Upload",
+            "Enquiry Management",
+            "Installment Takeover Applications",
+            "User Management",
+            "Analytics",
+            "Notifications",
+            "Settings"
+        ]
+    },
+    "performance": {
+        "seo": true,
+        "serverSideRendering": true,
+        "lazyLoading": true,
+        "responsive": true,
+        "imageOptimization": true,
+        "fastLoading": true
+    },
+    "deliverables": [
+        "Next.js Website",
+        "React Native Android App",
+        "React Native iOS App",
+        "NestJS REST API",
+        "Admin Dashboard",
+        "PostgreSQL Database",
+        "Authentication",
+        "Docker Configuration",
+        "CI/CD Pipeline",
+        "Documentation"
+    ],
+    "instructions": [
+        "Generate clean, modular, production-ready code.",
+        "Follow enterprise architecture best practices.",
+        "Use reusable components.",
+        "Use strict TypeScript.",
+        "Create scalable folder structures.",
+        "Ensure accessibility and SEO.",
+        "Optimize for Core Web Vitals.",
+        "Use responsive layouts.",
+        "Build a premium luxury UI inspired by high-end automotive brands.",
+        "Do not include dealership management features.",
+        "Focus exclusively on Ntokozo Cars' vehicle inventory and installment takeover services."
+    ]
+}
