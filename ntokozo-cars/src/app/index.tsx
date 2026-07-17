@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Dimensions,
   FlatList,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -19,7 +20,7 @@ import { ThemedText } from '@/components/themed-text';
 import { VehicleCard } from '@/components/vehicle-card';
 import { Brand, MaxContentWidth, Radius, Shadow, Spacing } from '@/constants/theme';
 import { getFeaturedVehicles, MOCK_VEHICLES } from '@/data/vehicles';
-import { MOCK_COMMUNITY_PROJECTS } from '@/data/community';
+import { MOCK_COMMUNITY_PROJECTS, CommunityProject } from '@/data/community';
 import { useFavorites } from '@/hooks/use-favorites';
 import { useTheme } from '@/hooks/use-theme';
 import { Vehicle } from '@/types/vehicle';
@@ -44,6 +45,8 @@ export default function HomeScreen() {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
 
+  const [selectedProject, setSelectedProject] = useState<CommunityProject | null>(null);
+
   const featured = getFeaturedVehicles();
   const recent = MOCK_VEHICLES.slice(0, 6);
 
@@ -62,7 +65,18 @@ export default function HomeScreen() {
 
   const renderCommunityCard = useCallback(
     ({ item }: { item: typeof MOCK_COMMUNITY_PROJECTS[0] }) => (
-      <View style={{ width: 300, marginLeft: Spacing.three, backgroundColor: theme.card, borderRadius: Radius.large, borderWidth: 1, borderColor: theme.border, overflow: 'hidden' }}>
+      <Pressable
+        onPress={() => setSelectedProject(item)}
+        style={{
+          width: 300,
+          marginLeft: Spacing.three,
+          backgroundColor: theme.card,
+          borderRadius: Radius.large,
+          borderWidth: 1,
+          borderColor: theme.border,
+          overflow: 'hidden',
+        }}
+      >
         <Image source={{ uri: item.image }} style={{ width: '100%', height: 130 }} contentFit="cover" />
         <View style={{ padding: Spacing.three, gap: Spacing.one }}>
           {item.impactMetric && (
@@ -75,13 +89,16 @@ export default function HomeScreen() {
           <ThemedText style={{ fontSize: 15, fontWeight: '700', color: theme.text }}>
             {item.title}
           </ThemedText>
-          <ThemedText themeColor="textSecondary" style={{ fontSize: 12, lineHeight: 17 }}>
+          <ThemedText themeColor="textSecondary" style={{ fontSize: 12, lineHeight: 17 }} numberOfLines={2}>
             {item.description}
           </ThemedText>
+          <ThemedText style={{ fontSize: 12, fontWeight: '600', color: Brand.gold, marginTop: 4 }}>
+            Read More →
+          </ThemedText>
         </View>
-      </View>
+      </Pressable>
     ),
-    [theme],
+    [theme, setSelectedProject],
   );
 
   const paddingTop = Platform.OS === 'web' ? 80 : insets.top;
@@ -237,6 +254,50 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* ── Community Project Details Modal ── */}
+      <Modal visible={selectedProject !== null} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
+            {selectedProject && (
+              <>
+                <Image source={{ uri: selectedProject.image }} style={styles.modalProjectImage} contentFit="cover" />
+                
+                <View style={styles.modalProjectHeader}>
+                  {selectedProject.impactMetric && (
+                    <View style={[styles.badge, { backgroundColor: Brand.gold + '15', borderColor: Brand.gold }]}>
+                      <ThemedText style={styles.badgeText}>{selectedProject.impactMetric}</ThemedText>
+                    </View>
+                  )}
+                  <ThemedText style={styles.modalProjectDate}>{selectedProject.date}</ThemedText>
+                </View>
+
+                <ThemedText style={styles.modalProjectTitle}>{selectedProject.title}</ThemedText>
+                
+                <ThemedText themeColor="textSecondary" style={styles.modalProjectDesc}>
+                  {selectedProject.description}
+                </ThemedText>
+
+                <View style={styles.modalProjectActions}>
+                  <GoldButton
+                    label="Close"
+                    variant="outline"
+                    onPress={() => setSelectedProject(null)}
+                  />
+                  <GoldButton
+                    label="Get Involved via WhatsApp"
+                    icon="💬"
+                    onPress={() => {
+                      alert(`Thank you for wanting to support the ${selectedProject.title} project! Connecting you to Ntokozo Cars Support...`);
+                      setSelectedProject(null);
+                    }}
+                  />
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </NavigationLayout>
   );
 }
@@ -396,5 +457,61 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: '#000000AA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.four,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 500,
+    borderRadius: Radius.large,
+    borderWidth: 1,
+    padding: Spacing.four,
+    gap: Spacing.four,
+    overflow: 'hidden',
+  },
+  modalProjectImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: Radius.medium,
+  },
+  modalProjectHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  badge: {
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 2,
+    borderRadius: Radius.small,
+    borderWidth: 1,
+  },
+  badgeText: {
+    color: Brand.gold,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  modalProjectDate: {
+    fontSize: 12,
+    color: '#888',
+  },
+  modalProjectTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  modalProjectDesc: {
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  modalProjectActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: Spacing.two,
+    marginTop: Spacing.one,
   },
 });
