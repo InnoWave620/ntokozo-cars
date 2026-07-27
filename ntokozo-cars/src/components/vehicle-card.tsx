@@ -7,7 +7,9 @@ import { Brand, Radius, Shadow, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { Vehicle } from '@/types/vehicle';
 
+import { useState } from 'react';
 import { FavoriteButton } from './favorite-button';
+import { VehicleVideoModal } from './vehicle-video-modal';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -24,6 +26,7 @@ export function VehicleCard({
 }: VehicleCardProps) {
   const theme = useTheme();
   const router = useRouter();
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const formatPrice = (price: number) => `R ${price.toLocaleString('en-ZA')}`;
   const formatMileage = (km: number) => `${km.toLocaleString('en-ZA')} km`;
@@ -50,16 +53,33 @@ export function VehicleCard({
             transition={300}
           />
           {/* Badge */}
-          <View
-            style={[
-              styles.badge,
-              isInstallment ? styles.badgeInstallment : styles.badgeStandard,
-            ]}
-          >
-            <ThemedText style={styles.badgeText}>
-              {isInstallment ? 'Takeover' : 'For Sale'}
-            </ThemedText>
+          <View style={styles.badgeColumn}>
+            <View
+              style={[
+                styles.badge,
+                isInstallment ? styles.badgeInstallment : styles.badgeStandard,
+              ]}
+            >
+              <ThemedText style={styles.badgeText}>
+                {isInstallment ? 'Takeover' : 'For Sale'}
+              </ThemedText>
+            </View>
           </View>
+
+          {/* Video Play Button pinned inside photo container */}
+          {vehicle.videoUrl && (
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation?.();
+                setShowVideoModal(true);
+              }}
+              style={styles.videoPlayBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Play vehicle video"
+            >
+              <ThemedText style={styles.videoPlayBtnText}>Watch Video</ThemedText>
+            </Pressable>
+          )}
         </View>
 
         {/* Content */}
@@ -104,15 +124,40 @@ export function VehicleCard({
           />
         </View>
       )}
+
+      {/* Video Modal Player */}
+      <VehicleVideoModal
+        visible={showVideoModal}
+        vehicle={vehicle}
+        onClose={() => setShowVideoModal(false)}
+      />
     </View>
   );
 }
 
-function SpecPill({ label }: { label: string }) {
+function SpecPill({
+  label,
+  isHighlight = false,
+}: {
+  label: string;
+  isHighlight?: boolean;
+}) {
   const theme = useTheme();
   return (
-    <View style={[styles.pill, { backgroundColor: theme.backgroundElement }]}>
-      <ThemedText themeColor="textSecondary" style={styles.pillText}>
+    <View
+      style={[
+        styles.pill,
+        isHighlight
+          ? { backgroundColor: Brand.gold + '22', borderWidth: 1, borderColor: Brand.gold + '66' }
+          : { backgroundColor: theme.backgroundElement },
+      ]}
+    >
+      <ThemedText
+        style={[
+          styles.pillText,
+          isHighlight ? { color: Brand.gold, fontWeight: '700' } : { color: theme.textSecondary },
+        ]}
+      >
         {label}
       </ThemedText>
     </View>
@@ -137,13 +182,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  badge: {
+  badgeColumn: {
     position: 'absolute',
     top: Spacing.two,
     left: Spacing.two,
+    gap: Spacing.one,
+  },
+  badge: {
     paddingHorizontal: Spacing.two,
     paddingVertical: 4,
     borderRadius: Radius.small,
+    alignSelf: 'flex-start',
   },
   badgeInstallment: {
     backgroundColor: Brand.gold,
@@ -156,6 +205,26 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  videoPlayBtn: {
+    position: 'absolute',
+    bottom: Spacing.two,
+    left: Spacing.two,
+    backgroundColor: '#000000CC',
+    borderWidth: 1,
+    borderColor: Brand.gold,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 4,
+    borderRadius: Radius.pill,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  videoPlayBtnText: {
+    color: Brand.gold,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.3,
   },
   favoriteBtn: {
     position: 'absolute',

@@ -28,6 +28,7 @@ export interface Vehicle {
   description: string;
   features: string[];
   photos: string[];
+  videoUrl?: string;
   listingType: ListingType;
   installment?: InstallmentDetails;
   province: string;
@@ -47,6 +48,7 @@ export interface SearchFilters {
   fuelType?: FuelType | '';
   province?: string;
   listingType?: ListingType | '';
+  hasVideoOnly?: boolean;
   query?: string;
 }
 

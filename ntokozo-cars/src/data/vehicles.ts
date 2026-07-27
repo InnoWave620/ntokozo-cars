@@ -67,6 +67,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
       'Bluetooth/Apple CarPlay',
     ],
     photos: CAR_IMAGES.bmw,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     listingType: 'Installment Takeover',
     installment: {
       monthlyInstallment: 6850,
@@ -106,6 +107,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
       '19" AMG Alloys',
     ],
     photos: CAR_IMAGES.mercedes,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     listingType: 'Installment Takeover',
     installment: {
       monthlyInstallment: 9200,
@@ -175,6 +177,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
       '18" Charleston Alloys',
     ],
     photos: CAR_IMAGES.volkswagen,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     listingType: 'Standard Sale',
     province: 'Gauteng',
   },
@@ -241,6 +244,7 @@ export const MOCK_VEHICLES: Vehicle[] = [
       '17" Raptor Alloys',
     ],
     photos: CAR_IMAGES.ford,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
     listingType: 'Installment Takeover',
     installment: {
       monthlyInstallment: 16500,

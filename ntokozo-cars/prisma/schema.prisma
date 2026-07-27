@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Vehicle {
+  id                      String                   @id @default(uuid())
+  brand                   String
+  model                   String
+  year                    Int
+  price                   Float
+  mileage                 Int
+  transmission            String
+  fuelType                String
+  engine                  String
+  colour                  String
+  vin                     String?
+  description             String
+  features                String[]
+  photos                  String[]
+  videoUrl                String?
+  listingType             String                   // 'Standard Sale' | 'Installment Takeover'
+  province                String
+  isFeatured              Boolean                  @default(false)
+  
+  // Installment Details (optional)
+  monthlyInstallment      Float?
+  remainingTerm           Int?
+  deposit                 Float?
+  financeInstitution      String?
+  balloonPayment          Float?
+  settlementAmount        Float?
+  financeApprovalRequired Boolean                  @default(false)
+
+  enquiries               Enquiry[]
+  installmentApplications InstallmentApplication[]
+
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+}
+
+model Enquiry {
+  id          String   @id @default(uuid())
+  fullName    String
+  phoneNumber String
+  emailAddress String
+  message     String
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+model InstallmentApplication {
+  id               String   @id @default(uuid())
+  fullName         String
+  phoneNumber      String
+  emailAddress     String
+  monthlyIncome    Float
+  employmentStatus String
+  vehicleId        String
+  vehicle          Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

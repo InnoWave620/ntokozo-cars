@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FavoriteButton } from '@/components/favorite-button';
 import { GoldButton } from '@/components/gold-button';
 import { ThemedText } from '@/components/themed-text';
+import { VehicleVideoModal } from '@/components/vehicle-video-modal';
 import { Brand, MaxContentWidth, Radius, Shadow, Spacing } from '@/constants/theme';
 import { getVehicleById } from '@/data/vehicles';
 import { useFavorites } from '@/hooks/use-favorites';
@@ -33,6 +34,7 @@ export default function VehicleDetailScreen() {
   const theme = useTheme();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [activePhoto, setActivePhoto] = useState(0);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const vehicle = getVehicleById(id ?? '');
 
@@ -150,6 +152,22 @@ export default function VehicleDetailScreen() {
               </ThemedText>
             )}
           </View>
+
+          {/* Video Tour Button */}
+          {vehicle.videoUrl && (
+            <Pressable
+              onPress={() => setShowVideoModal(true)}
+              style={styles.videoTourBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Watch video tour of vehicle"
+            >
+              <View style={styles.videoTourBtnTextContainer}>
+                <ThemedText style={styles.videoTourBtnTitle}>Watch Video Walkthrough</ThemedText>
+                <ThemedText style={styles.videoTourBtnSubtitle}>Take a 360° virtual tour of this vehicle</ThemedText>
+              </View>
+              <ThemedText style={styles.videoTourBtnArrow}>▶</ThemedText>
+            </Pressable>
+          )}
         </View>
 
         {/* Specs Grid */}
@@ -177,7 +195,7 @@ export default function VehicleDetailScreen() {
         {isInstallment && vehicle.installment && (
           <View style={[styles.card, { backgroundColor: Brand.gold + '18', borderColor: Brand.gold + '44' }]}>
             <ThemedText style={[styles.cardTitle, { color: Brand.gold }]}>
-              💳 Installment Takeover Details
+              Installment Takeover Details
             </ThemedText>
             <View style={styles.specsGrid}>
               {[
@@ -222,7 +240,7 @@ export default function VehicleDetailScreen() {
           <View style={styles.featuresGrid}>
             {vehicle.features.map((f) => (
               <View key={f} style={[styles.featureChip, { backgroundColor: theme.backgroundSelected }]}>
-                <ThemedText style={styles.featureText}>✓ {f}</ThemedText>
+                <ThemedText style={styles.featureText}>{f}</ThemedText>
               </View>
             ))}
           </View>
@@ -232,20 +250,25 @@ export default function VehicleDetailScreen() {
         <View style={styles.cta}>
           <GoldButton
             label="WhatsApp Us"
-            icon="💬"
             onPress={handleWhatsApp}
             variant="gold"
             fullWidth
           />
           <GoldButton
             label="Call Now"
-            icon="📞"
             onPress={handleCall}
             variant="outline"
             fullWidth
           />
         </View>
       </View>
+
+      {/* Video Modal Player */}
+      <VehicleVideoModal
+        visible={showVideoModal}
+        vehicle={vehicle}
+        onClose={() => setShowVideoModal(false)}
+      />
     </ScrollView>
   );
 }
@@ -406,5 +429,37 @@ const styles = StyleSheet.create({
   cta: {
     gap: Spacing.two,
     marginTop: Spacing.two,
+  },
+  videoTourBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#16130D',
+    borderWidth: 1,
+    borderColor: Brand.gold + '66',
+    padding: Spacing.three,
+    borderRadius: Radius.medium,
+    gap: Spacing.three,
+    marginTop: Spacing.two,
+  },
+  videoTourBtnIcon: {
+    fontSize: 24,
+  },
+  videoTourBtnTextContainer: {
+    flex: 1,
+    gap: 2,
+  },
+  videoTourBtnTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Brand.gold,
+  },
+  videoTourBtnSubtitle: {
+    fontSize: 12,
+    color: '#AAA',
+  },
+  videoTourBtnArrow: {
+    fontSize: 14,
+    color: Brand.gold,
+    fontWeight: '700',
   },
 });

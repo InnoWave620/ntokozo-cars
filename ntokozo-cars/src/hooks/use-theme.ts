@@ -3,8 +3,8 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export function useTheme() {
   const scheme = useColorScheme();
-  // Strictly enforce only 'light' or 'dark' to prevent undefined theme lookup crashes
-  const theme = scheme === 'light' ? 'light' : 'dark';
+  // Default to light (white background)
+  const theme = scheme === 'dark' ? 'dark' : 'light';
 
   return Colors[theme];
 }

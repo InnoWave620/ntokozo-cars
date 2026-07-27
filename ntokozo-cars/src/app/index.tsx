@@ -13,8 +13,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { NavigationLayout } from '@/components/navigation-layout';
+import { AppLogo } from '@/components/app-logo';
 import { GoldButton } from '@/components/gold-button';
+import { NavigationLayout } from '@/components/navigation-layout';
 import { SectionHeader } from '@/components/section-header';
 import { ThemedText } from '@/components/themed-text';
 import { VehicleCard } from '@/components/vehicle-card';
@@ -35,8 +36,8 @@ const STATS = [
 ];
 
 const QUICK_ACTIONS = [
-  { label: 'Browse All Cars', href: '/browse', icon: '🚗', variant: 'gold' as const },
-  { label: 'Installment Takeovers', href: '/browse?type=Installment+Takeover', icon: '💳', variant: 'outline' as const },
+  { label: 'Browse All Cars', href: '/browse', variant: 'gold' as const },
+  { label: 'Installment Takeovers', href: '/browse?type=Installment+Takeover', variant: 'outline' as const },
 ];
 
 export default function HomeScreen() {
@@ -115,18 +116,15 @@ export default function HomeScreen() {
       >
         <View style={styles.inner}>
           {/* ── Hero ── */}
-          <View style={[styles.hero, { backgroundColor: Brand.dark }]}>
+          <View style={[styles.hero, { backgroundColor: theme.backgroundElement, borderColor: theme.border, borderWidth: 1 }]}>
             <View style={styles.heroContent}>
-              <View style={styles.heroBadge}>
-                <ThemedText style={styles.heroBadgeText}>🏆 Ntokozo Cars</ThemedText>
-              </View>
-              <ThemedText style={styles.heroTitle}>
+              <ThemedText style={[styles.heroTitle, { color: theme.text }]}>
                 Drive Premium.{'\n'}
                 <ThemedText style={[styles.heroTitle, { color: Brand.gold }]}>
                   Own Confidently.
                 </ThemedText>
               </ThemedText>
-              <ThemedText style={styles.heroSubtitle}>
+              <ThemedText style={[styles.heroSubtitle, { color: theme.textSecondary }]}>
                 South Africa's trusted marketplace for pre-owned luxury vehicles and installment takeover deals.
               </ThemedText>
 
@@ -135,7 +133,6 @@ export default function HomeScreen() {
                   <GoldButton
                     key={action.label}
                     label={action.label}
-                    icon={action.icon}
                     variant={action.variant}
                     onPress={() => router.push(action.href as any)}
                   />
@@ -144,11 +141,11 @@ export default function HomeScreen() {
             </View>
 
             {/* Stats bar */}
-            <View style={[styles.statsBar, { backgroundColor: '#1A1A1A' }]}>
+            <View style={[styles.statsBar, { backgroundColor: theme.card, borderTopWidth: 1, borderTopColor: theme.border }]}>
               {STATS.map((stat, i) => (
-                <View key={stat.value} style={[styles.statItem, i < STATS.length - 1 && styles.statDivider]}>
+                <View key={stat.value} style={[styles.statItem, i < STATS.length - 1 && { borderRightWidth: 1, borderRightColor: theme.border }]}>
                   <ThemedText style={styles.statValue}>{stat.value}</ThemedText>
-                  <ThemedText style={styles.statLabel}>{stat.label}</ThemedText>
+                  <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>{stat.label}</ThemedText>
                 </View>
               ))}
             </View>

@@ -8,6 +8,7 @@ import {
 } from 'expo-router/ui';
 import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
 
+import { AppLogo } from './app-logo';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
@@ -102,8 +103,7 @@ function WebNavBar({
       <View style={styles.navbarInner}>
         {/* Brand */}
         <View style={styles.brand}>
-          <View style={[styles.brandDot, { backgroundColor: Brand.gold }]} />
-          <ThemedText style={styles.brandName}>NTOKOZO CARS</ThemedText>
+          <AppLogo variant="medium" />
         </View>
 
         {/* Nav Links */}

@@ -37,6 +37,7 @@ export default function SellScreen() {
   const [colour, setColour] = useState('');
   const [province, setProvince] = useState('Gauteng');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [description, setDescription] = useState('');
   const [featuresText, setFeaturesText] = useState('');
 
@@ -67,6 +68,7 @@ export default function SellScreen() {
       colour: colour || 'Black',
       province,
       photos,
+      videoUrl: videoUrl || undefined,
       description,
       features,
     });
@@ -78,8 +80,7 @@ export default function SellScreen() {
     return (
       <NavigationLayout>
         <View style={[styles.successContainer, { backgroundColor: theme.background }]}>
-          <ThemedText style={styles.successIcon}>🎉</ThemedText>
-          <ThemedText style={styles.successTitle}>Listing Submitted!</ThemedText>
+          <ThemedText style={styles.successTitle}>Listing Submitted Successfully</ThemedText>
           <ThemedText themeColor="textSecondary" style={styles.successText}>
             Thank you for uploading your car to Ntokozo Cars.{'\n\n'}
             Our verification agents will contact you shortly to perform a physical vehicle inspection and verify the market evaluation before publishing it live.
@@ -98,6 +99,7 @@ export default function SellScreen() {
               setDescription('');
               setFeaturesText('');
               setPhotoUrl('');
+              setVideoUrl('');
               router.push('/browse');
             }}
           />
@@ -297,6 +299,17 @@ export default function SellScreen() {
                 value={photoUrl}
                 onChangeText={setPhotoUrl}
                 placeholder="Paste an image URL"
+                placeholderTextColor="#666"
+              />
+            </View>
+
+            <View style={styles.formItem}>
+              <ThemedText style={styles.inputLabel}>Video Walkthrough URL (Optional)</ThemedText>
+              <TextInput
+                style={[styles.input, { color: theme.text, borderColor: theme.border, backgroundColor: theme.background }]}
+                value={videoUrl}
+                onChangeText={setVideoUrl}
+                placeholder="e.g. https://.../video.mp4"
                 placeholderTextColor="#666"
               />
             </View>
